@@ -26,6 +26,10 @@ func main() {
 	} else {
 		log.StdLog = log.New(w, "")
 	}
+    // first set a lowwer level, otherwise the log file can not be generated.
+    log.SetLevel(log.LevelInfo)
+    log.Infof("start........")
+
 	log.SetLevelString(logLevel)
 	// test
 	log.Debugf("debug log.")
