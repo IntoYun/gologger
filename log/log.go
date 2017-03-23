@@ -557,7 +557,6 @@ func Info(v ...interface{}) {
 	}
 	s := fmt.Sprint(v...)
 	StdLog.output(1, nil, t, s)
-	fluentPost(s)
 }
 
 func Infof(format string, v ...interface{}) {
@@ -567,7 +566,6 @@ func Infof(format string, v ...interface{}) {
 	}
 	s := fmt.Sprintf(format, v...)
 	StdLog.output(1, nil, t, s)
-	fluentPost(s)
 }
 
 func InfoError(err error, v ...interface{}) {
@@ -597,7 +595,6 @@ func Debug(v ...interface{}) {
 	}
 	s := fmt.Sprint(v...)
 	StdLog.output(1, nil, t, s)
-	fluentPost(s)
 }
 
 func Debugf(format string, v ...interface{}) {
@@ -607,7 +604,6 @@ func Debugf(format string, v ...interface{}) {
 	}
 	s := fmt.Sprintf(format, v...)
 	StdLog.output(1, nil, t, s)
-	fluentPost(s)
 }
 
 func DebugError(err error, v ...interface{}) {
@@ -633,19 +629,16 @@ func DebugErrorf(err error, format string, v ...interface{}) {
 func Print(v ...interface{}) {
 	s := fmt.Sprint(v...)
 	StdLog.output(1, nil, 0, s)
-	fluentPost(s)
 }
 
 func Printf(format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
 	StdLog.output(1, nil, 0, s)
-	fluentPost(s)
 }
 
 func Println(v ...interface{}) {
 	s := fmt.Sprintln(v...)
 	StdLog.output(1, nil, 0, s)
-	fluentPost(s)
 }
 
 func fluentPost(message string) {
