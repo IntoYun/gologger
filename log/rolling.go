@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/congleetea/gologger/errors"
+	"github.com/intoyun/gologger/errors"
 )
 
 type rollingFile struct {

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/congleetea/gologger/trace"
+	"github.com/intoyun/gologger/trace"
 )
 
 var TraceEnabled = true

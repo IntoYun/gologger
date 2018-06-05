@@ -8,30 +8,39 @@ import (
 )
 
 var (
-	f         *fluent.Fluent
+	f *fluent.Fluent
 	FluentTag string
+	Connected bool
 )
 
 func Post(message interface{}) {
-	f.Post(FluentTag, message)
+	if Connected {
+		f.Post(FluentTag, message)
+	}
 }
 
 func PostWithTime(tm time.Time, message interface{}) {
-	f.PostWithTime(FluentTag, tm, message)
+	if Connected {
+		f.PostWithTime(FluentTag, tm, message)
+	}
 }
 
 func EncodeAndPostData(tm time.Time, data interface{}) {
-	f.EncodeAndPostData(FluentTag, tm, data)
+	if Connected {
+		f.EncodeAndPostData(FluentTag, tm, data)
+	}
 }
 
-func InitSetting(fluentHost string, fluentPort int, appname string) {
+func New(fluentHost string, fluentPort int, appName string) bool {
 	var err error
 	f, err = fluent.New(fluent.Config{FluentHost: fluentHost, FluentPort: fluentPort})
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("==> Connect to fluent Error: ", err)
+		Connected = false
+	} else {
+		Connected = true
+		FluentTag = appName
 	}
-	var data = map[string]string{
-		"txt": "fluent started.",
-	}
-	f.Post(appname, data)
+
+	return Connected
 }

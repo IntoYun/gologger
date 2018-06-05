@@ -14,9 +14,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/congleetea/gologger/errors"
-	"github.com/congleetea/gologger/fluent"
-	"github.com/congleetea/gologger/trace"
+	"github.com/intoyun/gologger/errors"
+	"github.com/intoyun/gologger/fluent"
+	"github.com/intoyun/gologger/trace"
 )
 
 const (
@@ -111,17 +111,6 @@ func (l *LogLevel) Test(m LogType) bool {
 	return (v & int64(m)) != 0
 }
 
-type nopCloser struct {
-	io.Writer
-}
-
-func (*nopCloser) Close() error {
-	return nil
-}
-
-func NopCloser(w io.Writer) io.WriteCloser {
-	return &nopCloser{w}
-}
 
 type Logger struct {
 	mu    sync.Mutex
@@ -129,21 +118,6 @@ type Logger struct {
 	log   *log.Logger
 	level LogLevel
 	trace LogLevel
-}
-
-var StdLog = New(NopCloser(os.Stderr), "")
-
-func New(writer io.Writer, prefix string) *Logger {
-	out, ok := writer.(io.WriteCloser)
-	if !ok {
-		out = NopCloser(writer)
-	}
-	return &Logger{
-		out:   out,
-		log:   log.New(out, prefix, LstdFlags|Lshortfile),
-		level: LevelAll,
-		trace: LevelError,
-	}
 }
 
 func (l *Logger) Flags() int {
@@ -410,6 +384,34 @@ func (l *Logger) output(traceskip int, err error, t LogType, s string) error {
 	return l.log.Output(traceskip+2, s)
 }
 
+
+type nopCloser struct {
+	io.Writer
+}
+
+func (*nopCloser) Close() error {
+	return nil
+}
+
+func NopCloser(w io.Writer) io.WriteCloser {
+	return &nopCloser{w}
+}
+
+func New(writer io.Writer, prefix string) *Logger {
+	out, ok := writer.(io.WriteCloser)
+	if !ok {
+		out = NopCloser(writer)
+	}
+	return &Logger{
+		out:   out,
+		log:   log.New(out, prefix, LstdFlags|Lshortfile),
+		level: LevelAll,
+		trace: LevelError,
+	}
+}
+
+var StdLog = New(NopCloser(os.Stderr), "")
+
 func Flags() int {
 	return StdLog.Flags()
 }
@@ -641,9 +643,19 @@ func Println(v ...interface{}) {
 	StdLog.output(1, nil, 0, s)
 }
 
+
+// combine fluentd
+var fluentEnable = false
+
+func InitFluent(host string, port int, tag string) {
+	fluentEnable = fluent.New(host, port, tag)
+}
+
 func fluentPost(message string) {
-	var data = map[string]string{
-		"txt": message,
+	if fluentEnable {
+		var data = map[string]string{
+			"txt": message,
+		}
+		fluent.PostWithTime(time.Now(), data)
 	}
-	fluent.PostWithTime(time.Now(), data)
 }
