@@ -10,7 +10,7 @@ import (
 	"github.com/intoyun/gologger/errors"
 )
 
-var fluentEnable = true
+var fluentEnable = false
 var logFile      = "gologger_test.log"
 
 func main() {
@@ -40,11 +40,44 @@ func main() {
 	log.SetLevel(log.LevelInfo)
 	log.Infof("==> gologger start...")
 
-	logLevel := "DEBUG"
-	log.SetLevelString(logLevel)
-	log.Debugf("==> this is a debug log.")
-	log.Infof("==> yep! this is a info log.")
+	log.SetLevelString("DEBUG")
+	log.Print("\n")
+	log.Println("==> set level to DEBUG.")
+	log.Debug("==> this is a debug log.")
+	log.Info("==> this is a info log.")
+	log.Warn("==> this is a warn log.")
+	log.Error("==> this is a error log with stack info automatically.")
 
-	errTest := errors.New("error log.")
-	log.Error(errTest, "==> hm! this is an error log.")
+	log.SetLevelString("INFO")
+	log.Print("\n")
+	log.Println("==> set level to INFO.")
+	log.Debugf("==> this will be ignored.")
+	log.Infof("==> this is a Info %s log.", "formatted")
+	log.Warnf("==> this is a Warn %s log.", "formatted")
+	log.Errorf("==> this is a Error %s log with stack info automatically.", "formatted")
+
+	gerr := errors.New("error testing")
+
+	log.SetLevelString("WARN")
+	log.Printf("%s", "\n")
+	log.Println("==> set level to WARN.")
+	log.DebugError(gerr, "==> this will be ignored.")
+	log.InfoError(gerr, "==> this will be ignored.")
+	log.WarnError(gerr, "==> this is a warn log with stack.")
+	log.ErrorError(gerr, "==> this is a Error log with stack info by purpose.")
+
+	log.SetLevelString("ERROR")
+	log.Printf("%s", "\n")
+	log.Println("==> set level to ERROR.")
+	log.DebugErrorf(gerr, "==> this will be ignored.")
+	log.InfoErrorf(gerr, "==> this will be ignored.")
+	log.WarnErrorf(gerr, "==> this will be ignored.")
+	log.ErrorErrorf(gerr, "==> this is a Error %s log with stack info by purpose.", "formatted")
+
+	log.SetLevelString("PANIC")
+	log.Printf("%s", "\n")
+	log.Println("==> set level to PANIC.")
+	log.ErrorError(gerr, "==> Error message will ignore the log level.")
+	log.PanicErrorf(gerr, "==> this is a Panic %s log with stack. will exit!!!", "formatted")
+	log.Println("==> this won't be executed.")
 }

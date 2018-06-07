@@ -120,239 +120,12 @@ type Logger struct {
 	trace LogLevel
 }
 
-func (l *Logger) Flags() int {
-	return l.log.Flags()
-}
-
-func (l *Logger) Prefix() string {
-	return l.log.Prefix()
-}
-
-func (l *Logger) SetFlags(flags int) {
-	l.log.SetFlags(flags)
-}
-
-func (l *Logger) SetPrefix(prefix string) {
-	l.log.SetPrefix(prefix)
-}
-
-func (l *Logger) SetLevel(v LogLevel) {
-	l.level.Set(v)
-}
-
-func (l *Logger) SetLevelString(s string) bool {
-	var v LogLevel
-	if !v.ParseFromString(s) {
-		return false
-	} else {
-		l.SetLevel(v)
-		return true
-	}
-}
-
-func (l *Logger) SetTraceLevel(v LogLevel) {
-	l.trace.Set(v)
-}
-
-func (l *Logger) Close() {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	l.out.Close()
-}
-
 func (l *Logger) isDisabled(t LogType) bool {
 	return t != TYPE_PANIC && !l.level.Test(t)
 }
 
 func (l *Logger) isTraceEnabled(t LogType) bool {
 	return t == TYPE_PANIC || l.trace.Test(t)
-}
-
-func (l *Logger) Panic(v ...interface{}) {
-	t := TYPE_PANIC
-	s := fmt.Sprint(v...)
-	l.output(1, nil, t, s)
-	os.Exit(1)
-}
-
-func (l *Logger) Panicf(format string, v ...interface{}) {
-	t := TYPE_PANIC
-	s := fmt.Sprintf(format, v...)
-	l.output(1, nil, t, s)
-	os.Exit(1)
-}
-
-func (l *Logger) PanicError(err error, v ...interface{}) {
-	t := TYPE_PANIC
-	s := fmt.Sprint(v...)
-	l.output(1, err, t, s)
-	os.Exit(1)
-}
-
-func (l *Logger) PanicErrorf(err error, format string, v ...interface{}) {
-	t := TYPE_PANIC
-	s := fmt.Sprintf(format, v...)
-	l.output(1, err, t, s)
-	os.Exit(1)
-}
-
-func (l *Logger) Error(v ...interface{}) {
-	t := TYPE_ERROR
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) Errorf(format string, v ...interface{}) {
-	t := TYPE_ERROR
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) ErrorError(err error, v ...interface{}) {
-	t := TYPE_ERROR
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) ErrorErrorf(err error, format string, v ...interface{}) {
-	t := TYPE_ERROR
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) Warn(v ...interface{}) {
-	t := TYPE_WARN
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) Warnf(format string, v ...interface{}) {
-	t := TYPE_WARN
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) WarnError(err error, v ...interface{}) {
-	t := TYPE_WARN
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) WarnErrorf(err error, format string, v ...interface{}) {
-	t := TYPE_WARN
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) Info(v ...interface{}) {
-	t := TYPE_INFO
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) Infof(format string, v ...interface{}) {
-	t := TYPE_INFO
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) InfoError(err error, v ...interface{}) {
-	t := TYPE_INFO
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) InfoErrorf(err error, format string, v ...interface{}) {
-	t := TYPE_INFO
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) Debug(v ...interface{}) {
-	t := TYPE_DEBUG
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) Debugf(format string, v ...interface{}) {
-	t := TYPE_DEBUG
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, nil, t, s)
-}
-
-func (l *Logger) DebugError(err error, v ...interface{}) {
-	t := TYPE_DEBUG
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprint(v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) DebugErrorf(err error, format string, v ...interface{}) {
-	t := TYPE_DEBUG
-	if l.isDisabled(t) {
-		return
-	}
-	s := fmt.Sprintf(format, v...)
-	l.output(1, err, t, s)
-}
-
-func (l *Logger) Print(v ...interface{}) {
-	s := fmt.Sprint(v...)
-	l.output(1, nil, 0, s)
-}
-
-func (l *Logger) Printf(format string, v ...interface{}) {
-	s := fmt.Sprintf(format, v...)
-	l.output(1, nil, 0, s)
-}
-
-func (l *Logger) Println(v ...interface{}) {
-	s := fmt.Sprintln(v...)
-	l.output(1, nil, 0, s)
 }
 
 func (l *Logger) output(traceskip int, err error, t LogType, s string) error {
@@ -384,6 +157,12 @@ func (l *Logger) output(traceskip int, err error, t LogType, s string) error {
 	return l.log.Output(traceskip+2, s)
 }
 
+func (l *Logger) Close() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.out.Close()
+}
+
 
 type nopCloser struct {
 	io.Writer
@@ -410,34 +189,42 @@ func New(writer io.Writer, prefix string) *Logger {
 	}
 }
 
+
+
 var StdLog = New(NopCloser(os.Stderr), "")
 
 func Flags() int {
-	return StdLog.Flags()
+	return StdLog.log.Flags()
 }
 
 func Prefix() string {
-	return StdLog.Prefix()
+	return StdLog.log.Prefix()
 }
 
 func SetFlags(flags int) {
-	StdLog.SetFlags(flags)
+	StdLog.log.SetFlags(flags)
 }
 
 func SetPrefix(prefix string) {
-	StdLog.SetPrefix(prefix)
+	StdLog.log.SetPrefix(prefix)
 }
 
 func SetLevel(v LogLevel) {
-	StdLog.SetLevel(v)
+	StdLog.level.Set(v)
 }
 
 func SetLevelString(s string) bool {
-	return StdLog.SetLevelString(s)
+	var v LogLevel
+	if !v.ParseFromString(s) {
+		return false
+	} else {
+		StdLog.level.Set(v)
+		return true
+	}
 }
 
-func SetTrace(v LogLevel) {
-	StdLog.SetTraceLevel(v)
+func SetTraceLevel(v LogLevel) {
+	StdLog.trace.Set(v)
 }
 
 func Panic(v ...interface{}) {
@@ -624,8 +411,8 @@ func DebugErrorf(err error, format string, v ...interface{}) {
 		return
 	}
 	s := fmt.Sprintf(format, v...)
-	fluentPost(s)
 	StdLog.output(1, err, t, s)
+	fluentPost(s)
 }
 
 func Print(v ...interface{}) {
